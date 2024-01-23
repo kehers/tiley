@@ -1,6 +1,6 @@
 {
   "name": "tiley",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Tiley (outline/tiley) for Vercel",
   "main": "index.js",
   "scripts": {
