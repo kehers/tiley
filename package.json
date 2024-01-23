@@ -1,6 +1,6 @@
 {
   "name": "tiley",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Tiley (outline/tiley) for Vercel",
   "main": "index.js",
   "scripts": {
@@ -11,8 +11,8 @@
   "dependencies": {
     "ejs": "^3.1.9",
     "express": "^4.18.2",
-    "gm": "^1.25.0",
     "hepburn": "^1.2.1",
-    "minimist": "^1.2.8"
+    "minimist": "^1.2.8",
+    "sharp": "^0.33.2"
   }
 }

@@ -1,12 +1,12 @@
 const express = require('express')
 const path = require('path')
-// const morgan = require('morgan')
 const initials = require('./lib/initials')
-const generateImage = require('./lib/generateImage')
 const generateFontSize = require('./lib/generateFontSize')
 const idToColor = require('./lib/idToColor')
 const { validateHex } = require('./lib/colors')
 const errorHandlingMiddleware = require('./middlewares/errorHandling')
+const ejs = require('ejs')
+const sharp = require('sharp')
 
 const port = process.env.PORT
 const app = express()
@@ -25,33 +25,28 @@ function getColor (req) {
   return idToColor(req.params.id)
 }
 
-app.set('views', path.join(__dirname, 'views'))
-app.set('view engine', 'ejs')
-// app.use(morgan('combined'))
-
-app.get('/avatar/:id(\\w+)/:initials.:format(png|jpg)', (req, res, next) => {
-  const color = getColor(req)
-  const text = initials(req.params.initials)
-  const font = 'public/fonts/opensans-semibold.ttf'
-  const format = req.params.format
-  const imageSize = parseInt(req.query.s, 10) || 100
-
-  res.set('Content-Type', `image/${format}`)
-  generateImage(imageSize, color, font, text, format).stream((err, stdout) => {
-    if (err) return next(err)
-    return stdout.pipe(res)
-  })
-})
-
-app.get('/avatar/:id(\\w+)/:initials.:format(svg)?', (req, res) => {
+app.get('/avatar/:id(\\w+)/:initials.:format(png|svg)?', async (req, res) => {
   const color = getColor(req)
   const text = initials(req.params.initials)
   const imageSize = parseInt(req.query.s, 10) || 100
   const fontSize = generateFontSize(imageSize)
+  console.log(fontSize)
+  const format = req.params.format
 
-  res.setHeader('Content-Type', 'image/svg+xml')
-  res.setHeader('vary', 'Accept-Encoding')
-  res.render('svg', { color, text, imageSize, fontSize })
+  if (format === 'png') {
+    const html = await ejs.renderFile(path.join(__dirname, 'views/svg.ejs'), { color, text, imageSize, fontSize, dy: '.25em' })
+    res.set('Content-Type', 'image/png')
+    const svg = Buffer.from(html)
+    sharp(svg, { density: 450 })
+      .resize({ width: imageSize })
+      .png()
+      .pipe(res)
+  } else {
+    const html = await ejs.renderFile(path.join(__dirname, 'views/svg.ejs'), { color, text, imageSize, fontSize, dy: 0 })
+    res.setHeader('Content-Type', 'image/svg+xml')
+    res.setHeader('vary', 'Accept-Encoding')
+    res.send(html)
+  }
 })
 
 app.get('/', (req, res) => {
@@ -62,4 +57,4 @@ app.use(errorHandlingMiddleware)
 console.log(`Listening: http://localhost:${port}`)
 app.listen(port)
 
-// module.exports = app
+module.exports = app
