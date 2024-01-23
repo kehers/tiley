@@ -1,4 +1,5 @@
 const express = require('express')
+const path = require('path')
 // const morgan = require('morgan')
 const initials = require('./lib/initials')
 const generateImage = require('./lib/generateImage')
@@ -24,7 +25,7 @@ function getColor (req) {
   return idToColor(req.params.id)
 }
 
-app.set('views', 'views')
+app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 // app.use(morgan('combined'))
 
