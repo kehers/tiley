@@ -3,7 +3,7 @@
   "builds": [
     {
       "src": "index.js",
-      "use": "@now/node"
+      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -12,5 +12,5 @@
       "dest": "index.js"
     }
   ],
-  "installCommand": "yum install ImageMagick"
+  "installCommand": "npm install --cpu=x64 --os=linux sharp"
 }
